@@ -1,0 +1,60 @@
+Certainly! Here's an example of a GitHub Actions workflow that can be used to destroy the infrastructure created by the repository's Terraform code:
+
+```yaml
+name: Destroy Infrastructure
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: 'Confirmation to proceed with infrastructure destruction'
+        required: true
+        default: 'false'
+
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Initialize Terraform
+        run: terraform init
+
+      - name: Validate Terraform configuration
+        run: terraform validate
+
+      - name: Plan infrastructure destruction
+        run: terraform plan -destroy
+
+      - name: Confirm infrastructure destruction
+        if: ${{ github.event.inputs.confirmation == 'true' }}
+        run: terraform destroy -auto-approve
+```
+
+This workflow is triggered manually using the "Workflow Dispatch" event. It requires confirmation input to proceed with the infrastructure destruction.
+
+The workflow performs the following steps:
+
+1. Checks out the repository code.
+2. Sets up Terraform.
+3. Configures AWS credentials.
+4. Initializes Terraform.
+5. Validates the Terraform configuration.
+6. Plans the infrastructure destruction using `terraform plan -destroy`.
+7. If the confirmation input is set to "true", it proceeds with infrastructure destruction by executing `terraform destroy -auto-approve`.
+
+To trigger the workflow, you can go to your repository's Actions tab, select the "Destroy Infrastructure" workflow, and provide the confirmation input when prompted.
+
+Please note that destroying infrastructure can have irreversible consequences, so use this workflow with caution and ensure you have a backup or confirmation mechanism in place before executing the destruction step.

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Crossword Puzzle</title>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</head>
+<body>
+    <h1>Crossword Puzzle</h1>
+    <div id="puzzle">
+        <table>
+            {% for row in puzzle %}
+            <tr>
+                {% for cell in row %}
+                <td>{{ cell }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <button onclick="generateNewPuzzle()">Generate New Puzzle</button>
+</body>
+</html>
