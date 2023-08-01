@@ -1,6 +1,3 @@
-Certainly! Here's an example of a GitHub Actions workflow that can be used to destroy the infrastructure created by the repository's Terraform code:
-
-```yaml
 name: Destroy Infrastructure
 
 on:
