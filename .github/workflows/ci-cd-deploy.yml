@@ -24,6 +24,11 @@ jobs:
           pip install --upgrade pytest
           pip install -r requirements.txt
 
+      - name: Check current directory
+        run: |
+          pwd
+          ls -l
+           
       - name: Run tests
         run: pytest
 
