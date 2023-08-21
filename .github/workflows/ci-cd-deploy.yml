@@ -30,7 +30,7 @@ jobs:
           ls -l
            
       - name: Run tests
-        run: pytest
+        run: pytest app/tests/
 
   deploy:
     needs: build
