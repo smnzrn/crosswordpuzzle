@@ -1,20 +1,10 @@
 import json
-import random
-from crossword import Crossword
+from pycrossword import Crossword
 
-def generate_puzzle(event, context):
-    # Extract required parameters from the event
-    grid_size = event['grid_size']
-    word_lengths = event['word_lengths']
+def generate_puzzle():
+    # Create a new crossword (using an example size and word list for demonstration)
+    crossword = Crossword(15, 15, words=['example', 'crossword', 'puzzle'])
+    crossword.compute_crossword(2)  # 2 seconds to compute the crossword
 
-    # Generate the crossword puzzle
-    crossword = Crossword(grid_size)
-    crossword.generate(word_lengths)
-
-    # Return the puzzle as a JSON response
-    response = {
-        'statusCode': 200,
-        'body': json.dumps(crossword.to_dict())
-    }
-
-    return response
+    # Convert crossword to a dictionary and return
+    return crossword.to_json()

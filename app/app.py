@@ -13,10 +13,5 @@ def index():
 def about():
     return render_template('about.html')
 
-def generate_puzzle():
-    # This is where you would generate the crossword puzzle
-    # and return it as a string
-    return '<p>This is the crossword puzzle.</p>'
-
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
