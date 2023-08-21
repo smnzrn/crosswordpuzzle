@@ -1,5 +1,5 @@
 from flask import Flask, render_template
-from puzzle_generator import generate_puzzle
+from .puzzle_generator import generate_puzzle
 
 app = Flask(__name__)
 
