@@ -5,4 +5,4 @@ MarkupSafe==2.0.1
 Werkzeug==2.0.1
 urllib3==1.22
 pytest==7.4.0
-pycrossword==0.4.0.3
+git+https://github.com/S0mbre/crossword.git
