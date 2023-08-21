@@ -1,12 +1,12 @@
 from flask import Flask, render_template
-from .puzzle_generator import generate_puzzle
+import puz
 
 app = Flask(__name__)
 
 @app.route('/')
 def index():
-    # Generate the crossword puzzle and pass it to the template
-    puzzle = generate_puzzle()
+    # Use puzpy here to generate the crossword puzzle and pass it to the template
+    puzzle = puz.Puzzle()  # Example of creating a new puzzle. You'd have to modify and expand on this.
     return render_template('index.html', puzzle=puzzle)
 
 @app.route('/about')
