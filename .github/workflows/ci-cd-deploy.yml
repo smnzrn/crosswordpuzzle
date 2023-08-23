@@ -23,18 +23,41 @@ jobs:
           python -m pip install --upgrade pip
           pip install --upgrade pytest
           pip install -r requirements.txt
-      
+
       - name: Check current directory
         run: |
           pwd
           ls -l
-           
+
       - name: Run tests
         run: pytest tests/
 
-  deploy:
+  build-and-push:
     needs: build
+    runs-on: ubuntu-latest
 
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      
+      - name: Configure AWS credentials for Docker
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Login to ECR
+        run: $(aws ecr get-login --no-include-email --region us-east-1)
+
+      - name: Build, tag, and push Docker image
+        run: |
+          docker build -t YOUR_REPO_NAME .
+          docker tag YOUR_REPO_NAME:latest YOUR_ECR_URI:latest
+          docker push YOUR_ECR_URI:latest
+
+  deploy:
+    needs: build-and-push
     runs-on: ubuntu-latest
 
     steps:
@@ -44,7 +67,7 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v1
 
-      - name: Configure AWS credentials
+      - name: Configure AWS credentials for Terraform
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -60,9 +83,6 @@ jobs:
       - name: Upload static files to S3
         run: |
           aws s3 sync app/static s3://${{ secrets.S3_BUCKET_NAME }}
-
-      - name: Deploy Lambda function
-        run: terraform apply -target=module.lambda -auto-approve
 
       - name: Show Terraform output
         run: terraform output
