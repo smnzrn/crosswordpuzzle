@@ -1,3 +1,35 @@
+resource "aws_ecr_repository" "my_repository" {
+  name                 = "crosswordpuzzle-repository"
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+}
+
+resource "aws_ecr_lifecycle_policy" "delete_old_images" {
+  repository = aws_ecr_repository.my_repository.name
+
+  policy = <<EOF
+{
+    "rules": [
+        {
+            "rulePriority": 1,
+            "description": "Keep last 10 images",
+            "selection": {
+                "tagStatus": "untagged",
+                "countType": "imageCountMoreThan",
+                "countNumber": 10
+            },
+            "action": {
+                "type": "expire"
+            }
+        }
+    ]
+}
+EOF
+}
+
 resource "aws_ecs_cluster" "crossword_cluster" {
   name = "crossword-cluster"
 }
@@ -27,6 +59,7 @@ resource "aws_ecs_service" "crossword_service" {
   launch_type     = "FARGATE"
 
   network_configuration {
+    security_groups = [aws_security_group.ecs_tasks_sg.id]
     subnets = var.subnet_ids
   }
 
@@ -43,14 +76,23 @@ resource "aws_lb" "crossword_lb" {
   name               = "crossword-lb"
   internal           = false
   load_balancer_type = "application"
+  security_groups    = [aws_security_group.alb_sg.id]
   subnets            = var.subnet_ids
+
+  enable_deletion_protection = false
+
+  access_logs {
+    bucket  = aws_s3_bucket.alb_logs.bucket
+    prefix  = "logs"
+    enabled = true
+  }
 }
 
 resource "aws_lb_target_group" "crossword_tg" {
   name     = "crossword-tg"
   port     = 80
   protocol = "HTTP"
-  vpc_id   = var.vpc_id
+  vpc_id   = aws_vpc.main_vpc.id
 }
 
 resource "aws_lb_listener" "front_end" {
@@ -77,6 +119,11 @@ resource "aws_iam_role" "ecs_execution_role" {
       }
     }]
   })
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_execution_role_attach" {
+  role       = aws_iam_role.ecs_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
 # ... (previous resources)
@@ -135,6 +182,13 @@ resource "aws_nat_gateway" "main_nat" {
   subnet_id     = aws_subnet.public_subnet.id
 }
 
+resource "random_string" "bucket_suffix" {
+  length  = 8
+  upper   = false
+  numbers = true
+  special = false
+}
+
 # Route for the Private Subnet to route traffic through the NAT Gateway
 resource "aws_route_table" "private_route_table" {
   vpc_id = aws_vpc.main_vpc.id
@@ -150,3 +204,62 @@ resource "aws_route_table_association" "private_route_association" {
   route_table_id = aws_route_table.private_route_table.id
 }
 
+resource "aws_s3_bucket" "alb_logs" {
+  bucket = "crossword-alb-logs-${random_string.bucket_suffix.result}"
+  acl    = "private"
+}
+
+resource "aws_flow_log" "vpc_flow_log" {
+  log_destination      = aws_s3_bucket.flow_logs.arn
+  log_destination_type = "s3"
+  traffic_type         = "ALL"
+  vpc_id               = aws_vpc.main_vpc.id
+}
+
+resource "aws_s3_bucket" "flow_logs" {
+  bucket = "crossword-vpc-flow-logs-${random_string.bucket_suffix.result}"
+  acl    = "private"
+}
+
+resource "aws_security_group" "alb_sg" {
+  vpc_id = aws_vpc.main_vpc.id
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_security_group" "ecs_tasks_sg" {
+  vpc_id = aws_vpc.main_vpc.id
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    security_groups = [aws_security_group.alb_sg.id]
+  }
+
+  # ingress {
+  #   from_port   = 80
+  #   to_port     = 80
+  #   protocol    = "tcp"
+  #   cidr_blocks = [aws_security_group.alb_sg.egress[0]["cidr_blocks"][0]]
+  # }
+}
