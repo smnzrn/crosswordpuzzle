@@ -5,14 +5,23 @@ variable "aws_region" {
 
 variable "docker_image" {
   description = "The Docker image location in ECR or any accessible Docker registry."
+  type        = string
 }
 
-variable "vpc_id" {
-  description = "The ID of the VPC where resources will be deployed."
+variable "vpc_cidr_block" {
+  description = "CIDR block for the VPC"
+  type        = string
+  default     = "10.0.0.0/16"
 }
 
-variable "subnet_ids" {
-  description = "List of subnet IDs for deployment."
-  type        = list(string)
+variable "public_subnet_cidr_block" {
+  description = "CIDR block for the public subnet"
+  type        = string
+  default     = "10.0.1.0/24"
 }
 
+variable "private_subnet_cidr_block" {
+  description = "CIDR block for the private subnet"
+  type        = string
+  default     = "10.0.2.0/24"
+}
