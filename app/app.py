@@ -3,11 +3,32 @@ import puz
 
 app = Flask(__name__)
 
+def parse_puz_file(file_path):
+    puzzle = puz.read(file_path)
+    
+    # You can extract various data from the puzzle object.
+    # For example:
+    title = puzzle.title
+    author = puzzle.author
+    width = puzzle.width
+    height = puzzle.height
+    solution = puzzle.solution  # this is the solution grid
+    
+    # Convert the solution to a 2D list for easier rendering in templates
+    solution_grid = [list(solution[i:i+width]) for i in range(0, len(solution), width)]
+    
+    return {
+        "title": title,
+        "author": author,
+        "width": width,
+        "height": height,
+        "solution_grid": solution_grid
+    }
+
 @app.route('/')
 def index():
-    # Use puzpy here to generate the crossword puzzle and pass it to the template
-    puzzle = puz.Puzzle()  # Example of creating a new puzzle. You'd have to modify and expand on this.
-    return render_template('index.html', puzzle=puzzle)
+    parsed_puzzle = parse_puz_file("puzzles/yourfile.puz")
+    return render_template('index.html', puzzle=parsed_puzzle)
 
 @app.route('/about')
 def about():

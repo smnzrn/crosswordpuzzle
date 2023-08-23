@@ -24,9 +24,6 @@ jobs:
           pip install --upgrade pytest
           pip install -r requirements.txt
       
-      - name: Explicitly install pycrossword
-        run: pip install pycrossword
-        
       - name: Check current directory
         run: |
           pwd
