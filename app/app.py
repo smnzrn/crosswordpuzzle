@@ -27,7 +27,7 @@ def parse_puz_file(file_path):
 
 @app.route('/')
 def index():
-    parsed_puzzle = parse_puz_file("puzzles/yourfile.puz")
+    parsed_puzzle = parse_puz_file("puzzles/uc230823.puz")
     return render_template('index.html', puzzle=parsed_puzzle)
 
 @app.route('/about')
