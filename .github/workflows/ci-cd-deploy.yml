@@ -112,6 +112,11 @@ jobs:
           echo "Captured static files bucket name: $STATIC_FILES_BUCKET_NAME"
           echo "STATIC_FILES_BUCKET_NAME=$STATIC_FILES_BUCKET_NAME" >> $GITHUB_ENV
 
+      - name: Tag and Push Docker image
+        run: |
+          docker tag crosswordpuzzle-flask-app:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/crosswordpuzzle-flask-app:latest
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/crosswordpuzzle-flask-app:latest
+
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
