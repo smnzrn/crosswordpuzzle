@@ -57,11 +57,9 @@ jobs:
         run: |
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
       
-      - name: Build, tag, and push Docker image
+      - name: Build Docker image
         run: |
           docker build -t crosswordpuzzle-flask-app .
-          docker tag crosswordpuzzle-flask-app:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/crosswordpuzzle-flask-app:latest
-          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/crosswordpuzzle-flask-app:latest
 
   seed-state:
     runs-on: ubuntu-latest
