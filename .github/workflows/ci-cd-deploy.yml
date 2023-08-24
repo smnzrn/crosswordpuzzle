@@ -89,9 +89,9 @@ jobs:
 
       # Right after applying the Terraform configuration, capture the S3 bucket name.
       - name: Capture S3 Bucket Name - Backend
-        id: capture-bucket-name
+        id: capture-statemgmt-bucket-name
         run: |
-          BACKEND_BUCKET_NAME=$(terraform output -json | jq -r .s3_bucket_name.value)
+          BACKEND_BUCKET_NAME=$(terraform output -json | jq -r ."statemgmt-bucket.value)
           echo "Captured bucket name: $BACKEND_BUCKET_NAME"
           echo "BACKEND_BUCKET_NAME=$BACKEND_BUCKET_NAME" >> $GITHUB_ENV
 
