@@ -63,7 +63,6 @@ jobs:
 
   seed-state:
     runs-on: ubuntu-latest
-    if: github.event.inputs.seed_tf_state == 'true' # This checks for a workflow_dispatch input
   
     steps:
       - name: Checkout repository
