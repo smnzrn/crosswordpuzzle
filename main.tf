@@ -255,11 +255,4 @@ resource "aws_security_group" "ecs_tasks_sg" {
     protocol    = "tcp"
     security_groups = [aws_security_group.alb_sg.id]
   }
-
-  # ingress {
-  #   from_port   = 80
-  #   to_port     = 80
-  #   protocol    = "tcp"
-  #   cidr_blocks = [aws_security_group.alb_sg.egress[0]["cidr_blocks"][0]]
-  # }
 }

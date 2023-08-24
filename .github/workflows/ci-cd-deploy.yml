@@ -54,13 +54,14 @@ jobs:
           aws-region: us-east-1
 
       - name: Login to ECR
-        run: $(aws ecr get-login --no-include-email --region us-east-1)
+        run: docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
+
 
       - name: Build, tag, and push Docker image
         run: |
-          docker build -t YOUR_REPO_NAME .
-          docker tag YOUR_REPO_NAME:latest YOUR_ECR_URI:latest
-          docker push YOUR_ECR_URI:latest
+          docker build -t crosswordpuzzle-flask-app .
+          docker tag crosswordpuzzle-flask-app:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com:latest
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com:latest
 
   seed-state:
     runs-on: ubuntu-latest
@@ -90,20 +91,27 @@ jobs:
           terraform apply -auto-approve
 
       # Right after applying the Terraform configuration, capture the S3 bucket name.
-      - name: Capture S3 Bucket Name
+      - name: Capture S3 Bucket Name - Backend
         id: capture-bucket-name
         run: |
-          BUCKET_NAME=$(terraform output -json | jq -r .s3_bucket_name.value)
-          echo "Captured bucket name: $BUCKET_NAME"
-          echo "BUCKET_NAME=$BUCKET_NAME" >> $GITHUB_ENV
+          BACKEND_BUCKET_NAME=$(terraform output -json | jq -r .s3_bucket_name.value)
+          echo "Captured bucket name: $BACKEND_BUCKET_NAME"
+          echo "BACKEND_BUCKET_NAME=$BACKEND_BUCKET_NAME" >> $GITHUB_ENV
 
       - name: Update backend-config.tfvars
         run: |
-          echo "aws_backend_bucketname = \"$BUCKET_NAME\"" > backend-config.tfvars
+          echo "aws_backend_bucketname = \"$BACKEND_BUCKET_NAME\"" > backend-config.tfvars
           echo "aws_backend_bucket_key = \"terraform.tfstate\"" >> backend-config.tfvars
           echo "aws_dynamodb_table    = \"terraform_state\"" >> backend-config.tfvars
           echo "aws_region            = \"us-east-1\"" >> backend-config.tfvars
-      
+
+      - name: Capture S3 Bucket Name - Static Files
+        id: capture-static-bucket-name
+        run: |
+          STATIC_FILES_BUCKET_NAME=$(terraform output -json | jq -r .staticfiles_bucket_name.value)
+          echo "Captured static files bucket name: $STATIC_FILES_BUCKET_NAME"
+          echo "STATIC_FILES_BUCKET_NAME=$STATIC_FILES_BUCKET_NAME" >> $GITHUB_ENV
+
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
@@ -126,12 +134,12 @@ jobs:
         run: |
           terraform init -backend-config="backend-config.tfvars"
 
-      - name: Deploy infrastructure
-        run: terraform apply -auto-approve
-
       - name: Upload static files to S3
         run: |
-          aws s3 sync app/static s3://${{ secrets.S3_BUCKET_NAME }}
+          aws s3 sync app/static s3://$STATIC_FILES_BUCKET_NAME
+       
+      - name: Deploy infrastructure
+        run: terraform apply -auto-approve
 
       - name: Show Terraform output
         run: terraform output

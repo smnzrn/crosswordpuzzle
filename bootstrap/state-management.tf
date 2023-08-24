@@ -6,7 +6,7 @@ resource "random_string" "bucket_suffix" {
 }
 
 resource "aws_s3_bucket" "bucket" {
-  bucket = "${var.base_bucket_name}-${random_string.bucket_suffix.result}"
+  bucket = "${var.statemgmt_bucket_name}-${random_string.bucket_suffix.result}"
   object_lock_configuration {
     object_lock_enabled = "Enabled"
   }

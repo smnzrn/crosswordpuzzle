@@ -1,7 +1,13 @@
-variable "base_bucket_name" {
+variable "statemgmt_bucket_name" {
   description = "The base name for the S3 bucket to store Terraform state."
   type        = string
-  default     = "mycrosswordpuzzle"  # You can change this default as per your preference.
+  default     = "mycrosswordpuzzle-statemgmt"  # You can change this default as per your preference.
+}
+
+variable "staticfiles_bucket_name" {
+  description = "The base name for the S3 bucket to store Terraform state."
+  type        = string
+  default     = "mycrosswordpuzzle-staticfiles"  # You can change this default as per your preference.
 }
 
 variable "aws_region" {
