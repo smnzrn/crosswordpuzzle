@@ -60,7 +60,7 @@ jobs:
       - name: Build, tag, and push Docker image
         run: |
           docker build -t crosswordpuzzle-flask-app .
-          docker tag crosswordpuzzle-flask-app:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com:latest
+          docker tag crosswordpuzzle-flask-app:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/crosswordpuzzle-flask-app:latest
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/crosswordpuzzle-flask-app:latest
 
   seed-state:
