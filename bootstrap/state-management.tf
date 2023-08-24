@@ -1,7 +1,7 @@
 resource "random_string" "bucket_suffix_stmgmt" {
   length  = 8
   upper   = false
-  numbers = true
+  number  = true
   special = false
 }
 
