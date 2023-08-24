@@ -54,9 +54,9 @@ jobs:
           aws-region: us-east-1
 
       - name: Login to ECR
-        run: docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
-
-
+        run: |
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
+      
       - name: Build, tag, and push Docker image
         run: |
           docker build -t crosswordpuzzle-flask-app .
