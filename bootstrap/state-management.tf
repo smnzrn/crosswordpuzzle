@@ -1,3 +1,10 @@
+data "aws_dynamodb_table" "existing" {
+  name = "terraform_state"
+  depends_on = [
+    aws_dynamodb_table.statemgmt-bucket
+  ]
+}
+
 resource "random_string" "bucket_suffix_stmgmt" {
   length  = 8
   upper   = false
@@ -7,6 +14,7 @@ resource "random_string" "bucket_suffix_stmgmt" {
 
 resource "aws_s3_bucket" "statemgmt-bucket" {
   bucket = "${var.statemgmt_bucket_name}-${random_string.bucket_suffix_stmgmt.result}"
+  count = data.aws_dynamodb_table.existing ? 0 : 1
   object_lock_configuration {
     object_lock_enabled = "Enabled"
   }
