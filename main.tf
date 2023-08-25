@@ -12,7 +12,7 @@ resource "aws_ecs_task_definition" "crossword_task" {
 
   container_definitions = jsonencode([{
     name  = "crossword-container"
-    image = "${aws_ecr_repository.my_repository.repository_url}:${var.docker_image}"
+    image = "${var.ecr_repository_url.my_repository.repository_url}:${var.docker_image}"
     portMappings = [{
       containerPort = 80
       hostPort      = 80
@@ -153,7 +153,7 @@ resource "aws_nat_gateway" "main_nat" {
 resource "random_string" "bucket_suffix" {
   length  = 8
   upper   = false
-  numbers = true
+  number = true
   special = false
 }
 

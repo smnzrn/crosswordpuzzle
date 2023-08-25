@@ -8,6 +8,11 @@ variable "docker_image" {
   type        = string
 }
 
+variable "ecr_repository_url" {
+  description = "The repository URL of the ECR repo"
+  type        = string
+}
+
 variable "vpc_cidr_block" {
   description = "CIDR block for the VPC"
   type        = string
