@@ -1,3 +1,7 @@
+locals {
+  subnet_ids = [aws_subnet.public_subnet.id, aws_subnet.private_subnet.id]
+}
+
 resource "aws_ecs_cluster" "crossword_cluster" {
   name = "crossword-cluster"
 }
@@ -12,7 +16,7 @@ resource "aws_ecs_task_definition" "crossword_task" {
 
   container_definitions = jsonencode([{
     name  = "crossword-container"
-    image = "${var.ecr_repository_url.my_repository.repository_url}:${var.docker_image}"
+    image = "${var.ecr_repository_url}:${var.docker_image}"
     portMappings = [{
       containerPort = 80
       hostPort      = 80
@@ -28,7 +32,7 @@ resource "aws_ecs_service" "crossword_service" {
 
   network_configuration {
     security_groups = [aws_security_group.ecs_tasks_sg.id]
-    subnets = var.subnet_ids
+    subnets = local.subnet_ids
   }
 
   load_balancer {
@@ -45,7 +49,7 @@ resource "aws_lb" "crossword_lb" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb_sg.id]
-  subnets            = var.subnet_ids
+  subnets            = local.subnet_ids
 
   enable_deletion_protection = false
 
@@ -153,7 +157,7 @@ resource "aws_nat_gateway" "main_nat" {
 resource "random_string" "bucket_suffix" {
   length  = 8
   upper   = false
-  number = true
+  numeric = true
   special = false
 }
 
