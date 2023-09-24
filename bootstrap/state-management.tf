@@ -1,3 +1,4 @@
+
 variable "check_existing_table" {
   description = "Set to true if you want to check for the existing table. Default is false, meaning it will always try to create a new table."
   default     = false
@@ -18,6 +19,13 @@ resource "aws_dynamodb_table" "terraform-lock" {
   attribute {
     name = "LockID"
     type = "S"
+  }
+}
+
+resource "aws_s3_bucket" "statemgmt-bucket" {
+  bucket = "${var.statemgmt_bucket_name}-${random_string.bucket_suffix_stmgmt.result}"
+  object_lock_configuration {
+    object_lock_enabled = "Enabled"
   }
 }
 
