@@ -116,7 +116,7 @@ jobs:
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/crosswordpuzzle-flask-app:latest
 
   deploy:
-    needs: build-and-push
+    needs: [build-and-push, seed-state]
     runs-on: ubuntu-latest
 
     steps:
