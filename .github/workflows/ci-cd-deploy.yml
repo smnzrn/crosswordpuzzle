@@ -91,6 +91,7 @@ jobs:
       - name: Capture S3 Bucket Name - Backend
         id: capture-statemgmt-bucket-name
         run: |
+          terraform output -json
           BACKEND_BUCKET_NAME=$(terraform output -json | jq -r ".s3_statemgmt_bucket_name.value")
           echo "Captured bucket name: $BACKEND_BUCKET_NAME"
           echo "BACKEND_BUCKET_NAME=$BACKEND_BUCKET_NAME" >> $GITHUB_ENV
