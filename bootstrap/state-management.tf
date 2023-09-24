@@ -1,8 +1,5 @@
 data "aws_dynamodb_table" "existing" {
   name = "terraform_state"
-  depends_on = [
-    aws_dynamodb_table.terraform-lock
-  ]
 }
 
 resource "random_string" "bucket_suffix_stmgmt" {
@@ -20,8 +17,8 @@ resource "aws_s3_bucket" "statemgmt-bucket" {
 }
   
 resource "aws_dynamodb_table" "terraform-lock" {
+  count = data.aws_dynamodb_table.existing.exists ? 0 : 1
   name = "terraform_state"
-  count = data.aws_dynamodb_table.existing ? 0 : 1
   billing_mode = "PAY_PER_REQUEST"
   hash_key = "LockID"
 
