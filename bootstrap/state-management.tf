@@ -1,3 +1,9 @@
+resource "random_string" "bucket_suffix_stmgmt" {
+  length  = 8
+  upper   = false
+  number  = true
+  special = false
+}
 
 variable "check_existing_table" {
   description = "Set to true if you want to check for the existing table. Default is false, meaning it will always try to create a new table."
