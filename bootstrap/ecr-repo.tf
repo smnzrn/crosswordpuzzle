@@ -2,8 +2,12 @@ data "aws_ecr_repository" "existing" {
   name = "crosswordpuzzle-repository"
 }
 
+locals {
+  repository_exists = try(length(data.aws_ecr_repository.existing.*.repository_url), 0) > 0 ? true : false
+}
+
 resource "aws_ecr_repository" "my_repository" {
-  count = length(data.aws_ecr_repository.existing) > 0 ? 0 : 1
+  count = local.repository_exists ? 0 : 1
   name                 = "crosswordpuzzle-repository"
   image_tag_mutability = "MUTABLE"
 
@@ -13,7 +17,8 @@ resource "aws_ecr_repository" "my_repository" {
 }
 
 resource "aws_ecr_lifecycle_policy" "delete_old_images" {
-  repository = aws_ecr_repository.my_repository[0].name
+  count      = local.repository_exists ? 0 : 1
+  repository = aws_ecr_repository.my_repository[count.index].name
 
   policy = <<EOF
 {
@@ -36,6 +41,6 @@ EOF
 }
 
 output "ecr_repository_url" {
-  value       = aws_ecr_repository.my_repository[0].repository_url
+  value       = local.repository_exists ? data.aws_ecr_repository.existing.repository_url : aws_ecr_repository.my_repository[0].repository_url
   description = "The URL of the ECR repository"
 }
