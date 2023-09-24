@@ -1,4 +1,9 @@
+data "aws_ecr_repository" "existing" {
+  name = "crosswordpuzzle-repository"
+}
+
 resource "aws_ecr_repository" "my_repository" {
+  count = length(data.aws_ecr_repository.existing) > 0 ? 0 : 1
   name                 = "crosswordpuzzle-repository"
   image_tag_mutability = "MUTABLE"
 
