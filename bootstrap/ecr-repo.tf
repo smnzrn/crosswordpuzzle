@@ -13,7 +13,7 @@ resource "aws_ecr_repository" "my_repository" {
 }
 
 resource "aws_ecr_lifecycle_policy" "delete_old_images" {
-  repository = aws_ecr_repository.my_repository.name
+  repository = aws_ecr_repository.my_repository[0].name
 
   policy = <<EOF
 {
@@ -36,6 +36,6 @@ EOF
 }
 
 output "ecr_repository_url" {
-  description = "URL of the ECR repository"
-  value       = aws_ecr_repository.my_repository.repository_url
+  value       = aws_ecr_repository.my_repository[0].repository_url
+  description = "The URL of the ECR repository"
 }
