@@ -87,6 +87,9 @@ jobs:
           terraform init
           terraform apply -auto-approve
 
+      - name: Check Terraform Outputs
+        run: terraform output -json
+        
       # Right after applying the Terraform configuration, capture the S3 bucket name.
       - name: Capture S3 Bucket Name - Backend
         id: capture-statemgmt-bucket-name
@@ -95,9 +98,6 @@ jobs:
           echo "Captured bucket name: $BACKEND_BUCKET_NAME"
           echo "BACKEND_BUCKET_NAME=$BACKEND_BUCKET_NAME" >> $GITHUB_ENV
           echo "Terraform Outputs: $(terraform output -json)"
-
-      - name: Check Terraform Outputs
-        run: terraform output -json
         
       - name: Update backend-config.tfvars
         run: |
