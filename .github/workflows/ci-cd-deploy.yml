@@ -96,6 +96,9 @@ jobs:
           echo "BACKEND_BUCKET_NAME=$BACKEND_BUCKET_NAME" >> $GITHUB_ENV
           echo "Terraform Outputs: $(terraform output -json)"
 
+      - name: Check Terraform Outputs
+        run: terraform output -json
+        
       - name: Update backend-config.tfvars
         run: |
           echo "aws_backend_bucketname = \"$BACKEND_BUCKET_NAME\"" > backend-config.tfvars
