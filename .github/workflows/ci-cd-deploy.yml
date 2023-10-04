@@ -96,7 +96,7 @@ jobs:
           echo "Terraform Outputs: $(terraform output -json)"
           terraform output -json > output.json
           cat output.json
-          BACKEND_BUCKET_NAME=$(jq ".s3_statemgmt_bucket_name.value" output.json)
+          BACKEND_BUCKET_NAME=$(jq '[].s3_statemgmt_bucket_name.value' output.json)
           echo "Backend Bucket: $BACKEND_BUCKET_NAME"
           echo "BACKEND_BUCKET_NAME=$BACKEND_BUCKET_NAME" >> $GITHUB_ENV
           echo "Terraform Outputs: $(terraform output -json)"
