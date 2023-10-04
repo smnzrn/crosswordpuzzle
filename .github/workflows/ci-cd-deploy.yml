@@ -87,9 +87,9 @@ jobs:
           terraform init
           terraform apply -auto-approve
 
-      - name: Check Terraform Outputs
-        run: terraform output -json
-        
+      - name: List Terraform State
+        run: terraform state list
+
       # Right after applying the Terraform configuration, capture the S3 bucket name.
       - name: Capture S3 Bucket Name - Backend
         id: capture-statemgmt-bucket-name
