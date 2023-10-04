@@ -40,3 +40,16 @@ jobs:
         env: 
           TF_LOG: DEBUG # You can set this to TRACE for even more verbose logs
         run: terraform destroy -auto-approve
+
+      - name: Destroy all S3 buckets and DynamoDB tables
+        run: |
+          # Delete all S3 buckets
+          for bucket in $(aws s3api list-buckets --query 'Buckets[*].Name' --output text); do
+            aws s3 rb "s3://${bucket}" --force
+          done
+      
+          # Delete all DynamoDB tables
+          for table in $(aws dynamodb list-tables --query 'TableNames' --output text); do
+            aws dynamodb delete-table --table-name "${table}"
+          done
+      
