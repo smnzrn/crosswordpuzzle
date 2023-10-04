@@ -94,7 +94,7 @@ jobs:
         run: |
           cd bootstrap
           echo "Terraform Outputs: $(terraform output -json)"
-          # BACKEND_BUCKET_NAME=$(terraform output -json | jq -r ".s3_statemgmt_bucket_name.value")
+          BACKEND_BUCKET_NAME=$(terraform output -json | jq -r ".s3_statemgmt_bucket_name.value")
           echo "Captured bucket name: $BACKEND_BUCKET_NAME"
           echo "BACKEND_BUCKET_NAME=$BACKEND_BUCKET_NAME" >> $GITHUB_ENV
           echo "Terraform Outputs: $(terraform output -json)"
@@ -109,6 +109,7 @@ jobs:
       - name: Capture S3 Bucket Name - Static Files
         id: capture-static-bucket-name
         run: |
+          cd bootstrap
           STATIC_FILES_BUCKET_NAME=$(terraform output -json | jq -r ".s3_staticfiles_bucket_name.value")
           echo "Captured static files bucket name: $STATIC_FILES_BUCKET_NAME"
           echo "STATIC_FILES_BUCKET_NAME=$STATIC_FILES_BUCKET_NAME" >> $GITHUB_ENV
