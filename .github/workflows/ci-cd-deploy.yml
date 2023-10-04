@@ -86,9 +86,7 @@ jobs:
           cd bootstrap 
           terraform init
           terraform apply -auto-approve
-
-      - name: List Terraform State
-        run: terraform state list
+          terraform state list
 
       # Right after applying the Terraform configuration, capture the S3 bucket name.
       - name: Capture S3 Bucket Name - Backend
