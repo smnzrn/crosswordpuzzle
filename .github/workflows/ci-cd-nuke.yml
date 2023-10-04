@@ -37,4 +37,6 @@ jobs:
 
       - name: Confirm infrastructure destruction
         if: ${{ github.event.inputs.confirmation == 'true' }}
+        env: 
+          TF_LOG: DEBUG # You can set this to TRACE for even more verbose logs
         run: terraform destroy -auto-approve
