@@ -32,8 +32,8 @@ jobs:
       - name: Validate Terraform configuration
         run: terraform validate
 
-      # - name: Plan infrastructure destruction
-      #   run: terraform plan -destroy
+      - name: Plan infrastructure destruction
+        run: terraform plan -destroy
 
       - name: Confirm infrastructure destruction
         if: ${{ github.event.inputs.confirmation == 'true' }}
