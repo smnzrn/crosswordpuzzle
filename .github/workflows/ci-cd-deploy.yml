@@ -94,7 +94,8 @@ jobs:
         run: |
           cd bootstrap
           echo "Terraform Outputs: $(terraform output -json)"
-          echo '{"s3_statemgmt_bucket_name": {"value": "mycrosswordpuzzle-statemgmt-y0e2jqey"}}' | jq -r ".s3_statemgmt_bucket_name.value"
+          terraform output -json > output.json
+          BACKEND_BUCKET_NAME=$(jq -r ".s3_statemgmt_bucket_name.value" output.json)          
           # BACKEND_BUCKET_NAME=$(terraform output -json | jq -r ".s3_statemgmt_bucket_name.value")
           echo "Captured bucket name: $BACKEND_BUCKET_NAME"
           echo "BACKEND_BUCKET_NAME=$BACKEND_BUCKET_NAME" >> $GITHUB_ENV
