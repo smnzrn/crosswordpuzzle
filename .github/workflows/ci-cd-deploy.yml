@@ -112,7 +112,9 @@ jobs:
         id: capture-static-bucket-name
         run: |
           cd bootstrap
-          STATIC_FILES_BUCKET_NAME=$(terraform output -json | jq -r ".s3_staticfiles_bucket_name.value")
+          terraform output -json > output.json
+          BACKEND_BUCKET_NAME=$(jq -r ".s3_staticfiles_bucket_name.value" output.json) 
+          # STATIC_FILES_BUCKET_NAME=$(terraform output -json | jq -r ".s3_staticfiles_bucket_name.value")
           echo "Captured static files bucket name: $STATIC_FILES_BUCKET_NAME"
           echo "STATIC_FILES_BUCKET_NAME=$STATIC_FILES_BUCKET_NAME" >> $GITHUB_ENV
 
