@@ -78,7 +78,8 @@ jobs:
   
       - name: Initialize Terraform in bootstrap directory
         run: |
-          cd bootstrap 
+          cd bootstrap
+          terraform refresh
           terraform init
           terraform apply -auto-approve
           terraform state list
