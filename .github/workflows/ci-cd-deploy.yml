@@ -93,10 +93,23 @@ jobs:
         id: capture-statemgmt-bucket-name
         run: |
           cd bootstrap
-          echo "Terraform Outputs: $(terraform output -json)"
-          terraform output -json | python -c "import sys; print(sys.stdin.read())"
-          BACKEND_BUCKET_NAME=$(terraform output -json | python -c "import sys, json; print(json.load(sys.stdin)['s3_statemgmt_bucket_name']['value'])")       
-          echo "Captured bucket name: $BACKEND_BUCKET_NAME"
+          echo '{
+            "ecr_repository_url": {
+              "sensitive": false,
+              "type": "string",
+              "value": "***.dkr.ecr.us-east-1.amazonaws.com/crosswordpuzzle-repository"
+            },
+            "s3_statemgmt_bucket_name": {
+              "sensitive": false,
+              "type": "string",
+              "value": "mycrosswordpuzzle-statemgmt-l3paw407"
+            },
+            "s3_staticfiles_bucket_name": {
+              "sensitive": false,
+              "type": "string",
+              "value": "mycrosswordpuzzle-staticfiles-n4nyqpaq"
+            }
+          }' | python -c "import sys, json; print(json.load(sys.stdin)['s3_statemgmt_bucket_name']['value'])"          
           echo "BACKEND_BUCKET_NAME=$BACKEND_BUCKET_NAME" >> $GITHUB_ENV
           echo "Terraform Outputs: $(terraform output -json)"
         
