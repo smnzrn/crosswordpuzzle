@@ -5,11 +5,6 @@ on:
     branches:
       - main
   workflow_dispatch:
-    inputs:
-      seed_tf_state:
-        description: 'Seed the Terraform state?'
-        required: true
-        default: 'false'
 
 jobs:
   build:
@@ -89,7 +84,20 @@ jobs:
           terraform state list
           terraform show
 
-      # Right after applying the Terraform configuration, capture the S3 bucket name.
+      - name: Check if Backend Bucket Exists
+        run: |
+          if ! aws s3api head-bucket --bucket $BACKEND_BUCKET_NAME 2>&1 | grep -q 'Not Found'; then
+            echo "Bucket exists"
+          else
+            echo "Bucket does not exist"
+            # Handle accordingly: Perhaps create it?
+          fi
+  
+      - name: Terraform Refresh
+        run: |
+          cd bootstrap
+          terraform refresh
+
       - name: Capture S3 Bucket Name - Backend
         id: capture-statemgmt-bucket-name
         run: |
@@ -131,37 +139,4 @@ jobs:
 
       - name: Tag and Push Docker image
         run: |
-          docker tag crosswordpuzzle-flask-app:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/crosswordpuzzle-flask-app:latest
-          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/crosswordpuzzle-flask-app:latest
-
-  deploy:
-    needs: [build-and-push, seed-state]
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v1
-
-      - name: Configure AWS credentials for Terraform
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-
-      - name: Initialize Terraform with backend
-        run: |
-          terraform init -backend-config="backend-config.tfvars"
-
-      - name: Upload static files to S3
-        run: |
-          aws s3 sync app/static s3://$STATIC_FILES_BUCKET_NAME
-       
-      - name: Deploy infrastructure
-        run: terraform apply -auto-approve
-
-      - name: Show Terraform output
-        run: terraform output
+          docker tag crosswordpuzzle-flask-app:latest ${{ secrets.AWS_ACCOUNT_ID }}
