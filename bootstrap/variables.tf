@@ -1,3 +1,9 @@
+
+variable "check_existing_table" {
+  description = "Set to true if you want to check for the existing table. Default is false, meaning it will always try to create a new table."
+  default     = true
+}
+
 variable "statemgmt_bucket_name" {
   description = "The base name for the S3 bucket to store Terraform state."
   type        = string
