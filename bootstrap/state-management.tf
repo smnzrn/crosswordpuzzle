@@ -36,7 +36,7 @@ resource "aws_s3_bucket" "statemgmt-bucket" {
 }
 
 output "dynamodb_table_name" {
-  value = data.external.check_dynamodb_table.result.exists == "true" ? data.external.check_dynamodb_table.result.table_name : aws_dynamodb_table.terraform_lock[0].name
+  value = data.external.check_dynamodb_table.result.exists == "true" ? data.external.check_dynamodb_table.result.table_name : aws_dynamodb_table.terraform-lock[0].name
 }
 
 output "s3_statemgmt_bucket_name" {
