@@ -88,6 +88,7 @@ jobs:
       - name: Make DynamoDB check script executable
         run: |
           cd bootstrap
+          ls
           chmod +x check-dynamodb-table.sh
 
       - name: Check if Backend Bucket Exists
