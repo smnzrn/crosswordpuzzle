@@ -1,6 +1,6 @@
 
 data "external" "check_dynamodb_table" {
-  program = ["bash", "${path.module}/check-dynamodb-table.sh"]
+  program = ["bash", "${path.module}/bootstrap/check-dynamodb-table.sh"]
 }
 
 resource "random_string" "bucket_suffix_stmgmt" {
